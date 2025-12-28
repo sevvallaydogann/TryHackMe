@@ -36,4 +36,5 @@ After gaining initial access, I checked for sudo privileges:
 ```
 I discovered that the user could run any command as root without a password. I executed sudo ls /root to access the file system and retrieved the final ingredient.
 
+
 **This project was created for educational purposes.**
