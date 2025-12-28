@@ -33,3 +33,6 @@ After gaining initial access, I checked for sudo privileges:
 **Result:**
 ```bash
 (ALL) NOPASSWD: ALL
+```
+
+This project was created for educational purposes.
