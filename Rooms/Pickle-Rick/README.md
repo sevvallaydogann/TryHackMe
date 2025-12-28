@@ -1,6 +1,6 @@
 # 🥒 Pickle Rick - CTF Writeup
 
-**Platform:** TryHackMe | **Difficulty:** Easy | **Language:** Python & Bash
+**Difficulty:** Easy | **Language:** Python & Bash
 
 ## Project Overview
 In this room, I exploited a vulnerable web server to retrieve 3 secret ingredients (flags). Instead of relying solely on the web interface, I developed a custom **Python Exploit Tool** (`exploit.py`) to automate the interaction with the command panel.
