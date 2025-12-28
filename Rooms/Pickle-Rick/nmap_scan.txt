@@ -1,0 +1,10 @@
+# Nmap 7.94 scan initiated
+# Command: nmap -sC -sV -oN nmap_scan.txt 10.10.x.x
+
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.7 (Ubuntu Linux; protocol 2.0)
+80/tcp open  http    Apache httpd 2.4.18 ((Ubuntu))
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+|_http-title: Rick is sup4r cool
+
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
