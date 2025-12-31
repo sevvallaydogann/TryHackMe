@@ -1,11 +1,9 @@
 # 🥒 Pickle Rick - CTF Writeup
 
-**Difficulty:** Easy | **Language:** Python & Bash
-
-## Project Overview
+## Overview
 In this room, I exploited a vulnerable web server to retrieve 3 secret ingredients (flags). Instead of relying solely on the web interface, I developed a custom **Python Exploit Tool** (`exploit.py`) to automate the interaction with the command panel.
 
-## Tools Used
+## Tools 
 * **Nmap:** Network scanning and service enumeration.
 * **Python (Requests & BeautifulSoup):** Automating authentication and command execution.
 * **Linux Terminal:** Manual enumeration and privilege escalation.
