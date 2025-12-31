@@ -1,35 +1,60 @@
-# Dig Dug - CTF Writeup
+# Dig Dug - DNS Analysis & Exploitation
 
-**Platform:** TryHackMe | **Difficulty:** Easy | **Category:** DNS Enumeration
+**Platform:** TryHackMe | **Topic:** Network Security / DNS | **Tool:** `dig`, `nmap`
 
-## Overview
-"Dig Dug" is a capture-the-flag challenge focusing on **DNS (Domain Name System)** exploration. The goal was to uncover a hidden flag stored within the DNS records of a target server using command-line tools.
+## Introduction & Learning Outcomes
+This project focuses on the **Domain Name System (DNS)**, often referred to as the "phonebook of the internet." The goal is not just to capture the flag, but to understand how DNS queries work, the difference between UDP and TCP in DNS, and how to enumerate records manually.
 
-## Tools Used
-* **Nmap:** For initial port scanning (TCP & UDP).
-* **Dig (Domain Information Groper):** For querying DNS records and performing zone transfers.
+### Core Concepts Covered:
+* **DNS Protocol:** How domain names are translated into IP addresses.
+* **Transport Layer:** Why DNS uses **UDP** for queries and **TCP** for zone transfers.
+* **Record Types:** Understanding `A`, `TXT`, and `PTR` records.
 
-## Walkthrough
+---
 
-### 1. Reconnaissance
-I started with a standard Nmap scan (`-sC -sV`) which revealed only SSH (Port 22). Suspecting a DNS challenge, I specifically scanned for **UDP Port 53**:
-`sudo nmap -sU -p 53 <TARGET_IP>`
-* **Result:** Port 53/udp was **OPEN**.
+## Technical Background 
 
-### 2. DNS Enumeration
-I attempted to interact with the DNS server using `dig`:
+Before diving into the solution, it is essential to understand the underlying technology.
 
-* **Version Query:** I tried to query `version.bind` to identify the server software, but the query was refused (ANSWER: 0).
-* **Reverse Lookup:** I performed a reverse DNS lookup (`dig -x <IP>`) to find the domain name associated with the IP, but it returned no results.
+### Why Port 53? (UDP vs. TCP)
+DNS servers typically listen on **Port 53**.
+* **UDP Port 53:** Used for standard queries (e.g., "What is the IP of google.com?"). It is connectionless and fast.
+* **TCP Port 53:** Used for **Zone Transfers (AXFR)** or when the response size exceeds 512 bytes.
+* *Security Note:* A standard Nmap scan (`nmap -sC -sV`) only checks TCP ports. To find a DNS server, we must explicitly scan UDP.
 
-### 3. Exploitation (The Flag)
-Following common CTF conventions, I queried the server for the domain name `givemetheflag.com`:
+### Key DNS Record Types
+* **A Record:** Maps a hostname to an IPv4 address.
+* **PTR Record:** Maps an IP address back to a hostname (Reverse DNS).
+* **TXT Record:** Arbitrary text data, often used for verification (SPF, DKIM) or leaving notes (where we found the flag).
+
+---
+
+## Walkthrough 
+
+### Discovery 
+A standard scan showed only SSH open. Knowing this is a DNS challenge, I performed a targeted **UDP Scan**:
+
 ```bash
-dig @<TARGET_IP> givemetheflag.com
+sudo nmap -sU -p 53 <TARGET_IP>
 ```
-Result: The server responded with a TXT record containing the flag: ``` flag{0767ccd06e79853318f25aeb08ff83e2} ```
 
-### 4. Zone Transfer Attempt
-I attempted a Zone Transfer (AXFR) to retrieve all DNS records: dig axfr @<TARGET_IP> givemetheflag.com 
-The request timed out.
-The server has TCP Port 53 closed or firewall rules blocking zone transfers, securing it against this specific attack.
+Port 53/udp was open. This confirmed a DNS service (Bind9) was running.
+
+### Interacting with DNS (dig command)
+Instead of a browser, I used the dig (Domain Information Groper) tool to talk directly to the server. 
+
+Firstly, I tried to find the domain name associated with the IP: dig -x <TARGET_IP> @<TARGET_IP> 
+There was no answer. The server is not configured for reverse lookups. 
+Then, following CTF conventions, I queried for the domain givemetheflag.com: dig @<TARGET_IP> givemetheflag.com
+I queried the authoritative nameserver specifically for this domain.
+
+### The Response
+```bash
+;; ANSWER SECTION:
+givemetheflag.com.      0       IN      TXT     "flag{0767ccd06e79853318f25aeb08ff83e2}"
+```
+
+Why TXT? Because administrators often use TXT records to store descriptive text. In this CTF, it was used to hide the flag.
+
+For the last step I attempted a Zone Transfer (AXFR) to replicate the entire DNS database: dig axfr @<TARGET_IP> givemetheflag.com 
+"Connection Timed Out" The server correctly blocks TCP Port 53 or AXFR requests, preventing data leakage. 
