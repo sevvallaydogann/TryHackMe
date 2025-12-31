@@ -1,0 +1,6 @@
+# Nmap Scan Result
+# Command: nmap -sC -sV 10.82.137.2
+
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.13
+53/udp open  domain  (Discovered via manual check)
