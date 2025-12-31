@@ -27,7 +27,7 @@ Following common CTF conventions, I queried the server for the domain name `give
 ```bash
 dig @<TARGET_IP> givemetheflag.com
 ```
-Result: The server responded with a TXT record containing the flag: ``` bash flag{0767ccd06e79853318f25aeb08ff83e2} ```
+Result: The server responded with a TXT record containing the flag: ``` flag{0767ccd06e79853318f25aeb08ff83e2} ```
 
 ### 4. Zone Transfer Attempt
 I attempted a Zone Transfer (AXFR) to retrieve all DNS records: dig axfr @<TARGET_IP> givemetheflag.com 
