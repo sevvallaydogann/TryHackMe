@@ -4,7 +4,7 @@
 
 This challenge represents a comprehensive penetration testing scenario focusing on two critical vulnerabilities: arbitrary file upload and SUID misconfiguration. Unlike standard approaches that rely on browser interactions, I conducted this exploitation entirely through the command line. This constraint required a deeper understanding of HTTP requests and manual payload delivery using `curl`, rather than relying on graphical interface tools.
 
-## Technical Walkthrough
+## Walkthrough
 
 ## Part 1: 
 
