@@ -24,7 +24,7 @@ Apache servers are often configured to execute code in files with alternative ex
 
 ## Part 3: 
 
-Since I was working purely from the CLI, setting up a reverse shell listener and keeping a connection alive was cumbersome. Instead, I opted for a stateless **Web Shell**.
+Since I was working from the CLI, setting up a reverse shell listener and keeping a connection alive was cumbersome. Instead, I opted for a stateless **Web Shell**.
 
 I created a tiny, one-line script:
 ```php
