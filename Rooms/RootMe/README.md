@@ -6,18 +6,44 @@ This challenge represents a comprehensive penetration testing scenario focusing 
 
 ## Technical Walkthrough
 
-### Network Reconnaissance and Discovery
-The investigation began with a network scan to identify the attack surface. While standard port scanning revealed an Apache web server, the critical entry point was hidden from the main navigation. By utilizing directory brute-forcing techniques, I uncovered a hidden `/panel` directory. This administrative endpoint presented a file upload form, which became the primary vector for the initial compromise.
+## Part 1: 
 
-### Bypassing Security Filters with a Web Shell
-Upon attempting to upload a standard PHP reverse shell, the server rejected the file, indicating the presence of an extension-based filter. To circumvent this security measure, I leveraged a common Apache misconfiguration where alternative extensions are executed as PHP. By renaming the payload extension from `.php` to **`.phtml`**, I successfully bypassed the filter.
+Every web challenge starts with finding where the vulnerability hides. A standard port scan showed me that an Apache server was running, but the homepage was just a static landing page. There was nothing to hack there.
 
-Instead of a heavy reverse shell connection, I deployed a lightweight **Web Shell** (`<?php system($_GET["cmd"]); ?>`). This approach allowed me to execute system commands directly via HTTP GET requests. Using `curl` to interact with this shell, I was able to traverse the file system and retrieve the user flag without needing a persistent network listener.
+I needed to see what the developers were hiding. I used **Gobuster** to brute-force the directory structure. My goal was to find administrative panels or backup files that aren't linked in the menu.
 
-### Privilege Escalation via SUID Misconfiguration
-With initial access established as the `www-data` user, the focus shifted to elevating privileges to root. I initiated a search for binaries with the **SUID (Set Owner User ID)** bit enabled. This special permission allows a binary to execute with the privileges of the file owner—in this case, root.
+The scan revealed a critical path: `/panel/`.
 
-The scan identified `/usr/bin/python` as having SUID permissions. This is a severe security oversight, as Python can interface directly with the operating system. Exploiting this, I crafted a one-line Python command to read the protected `/root/root.txt` file. Since the Python process spawned with root privileges due to the SUID bit, it bypassed the standard file access controls, allowing me to retrieve the final flag and complete the system compromise.
+When I inspected this endpoint (using `curl`), it turned out to be a file upload page and if you can upload a file, you can execute code.
+
+## Part 2: 
+
+My plan was uploading a PHP script that allows me to run system commands. However, the server had a security filter in place. When I tried to upload a standard `shell.php` file, the server rejected it immediately. The developers had blocked the `.php` extension. 
+
+Apache servers are often configured to execute code in files with alternative extensions. I renamed my payload to **`shell.phtml`**. The server's filter only looked for `.php`, so it let the `.phtml` file through, but the Apache engine still executed it as code.
+
+## Part 3: 
+
+Since I was working purely from the CLI, setting up a reverse shell listener and keeping a connection alive was cumbersome. Instead, I opted for a stateless **Web Shell**.
+
+I created a tiny, one-line script:
+```php
+<?php system($_GET["cmd"]); ?>
+```
+This script doesn't connect back to me. Instead, it waits for me to send a command via the URL (e.g., ?cmd=ls). It turns the web server into a command-line interface.
+
+I uploaded this file using a crafted curl POST request. Once uploaded, I could interact with the server by simply sending GET requests to my uploaded file. I successfully located and read the user.txt flag without ever leaving my terminal.
+
+## Part 4:
+
+Getting user access is only half the battle. I needed to become "root" (the administrator). To do this, I looked for SUID (Set User ID) binaries.
+
+Why SUID? In Linux, if a file has the SUID bit set, it executes with the permissions of the file's owner, not the user who runs it. If the owner is Root, and the program has a flaw, you can become Root.
+
+I ran a search for all SUID files owned by root. Buried among the standard system tools was an anomaly: /usr/bin/python.
+
+The Exploit: Python is a programming language that can interface with the operating system. Giving it SUID permissions is a massive security mistake. Since Python was running as root, I didn't need a password or an exploit script. I simply told Python to open the protected administrative flag: ```bash /usr/bin/python -c 'print(open("/root/root.txt").read())```
+Because the binary had SUID permissions, the system treated this command as if the Administrator themselves typed it. It printed the root flag to my terminal, completing the challenge.
 
 
 
