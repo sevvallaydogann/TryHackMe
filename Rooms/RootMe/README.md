@@ -36,7 +36,7 @@ I uploaded this file using a crafted curl POST request. Once uploaded, I could i
 
 ## Part 4:
 
-Getting user access is only half the battle. I needed to become "root" (the administrator). To do this, I looked for SUID (Set User ID) binaries.
+Last but not least, I needed to become "root" (the administrator). To do this, I looked for SUID (Set User ID) binaries.
 
 Why SUID? In Linux, if a file has the SUID bit set, it executes with the permissions of the file's owner, not the user who runs it. If the owner is Root, and the program has a flaw, you can become Root.
 
